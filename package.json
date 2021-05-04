@@ -4,9 +4,20 @@
   "description": "Internet Banking Application",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "author": "Sai ram krishna",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sairamkrishna1412/qwerty-bank-main.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sairamkrishna1412/qwerty-bank-main/issues"
+  },
+  "homepage": "https://github.com/sairamkrishna1412/qwerty-bank-main#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.12.7"
+  }
 }
