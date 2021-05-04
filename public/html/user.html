@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../css/resources/style.css">
+        <link rel="stylesheet" href="../css/resources/queries.css">
+        <link rel="shortcut icon" href="../img/banking_logo.png" type="image/x-icon">
+        <title>Overview</title>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <div class="row flex nav-bar">
+                    <div class="hero-text-box">
+                        <h1 class="hero-text">
+                            <a href="./index.html">Qwerty Bank</a>
+                        </h1>
+                    </div>
+                    <ul class="nav-main">
+                        <!-- <li><a href="./allCustomers.html">All customers</a></li> -->
+                        <li><a href="./login.html" class="btn nav__login">Login</a></li>
+                        <li><a href="./signup.html" class="btn nav__signup">Sign up</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <main id="main">
+            <!-- <h1>My transactions</h1> -->
+            <div class="user-container row">
+                <div class="user-profile">
+                        <img src="../img/users/user-1.jpg" class="profile-img" alt="user-1">
+                        <h3 class="user-welcome">Sai ram krishna</h3>
+                        <a href="./user-profile.html">
+                            <img src="../img/edit.png" class="profile-edit"alt="">
+                        </a>
+                </div>
+                <div class="account-summary sep">
+                    <div class="balance flex">
+                        <h3 class="highlight">Balance</h3>
+                        <span id="account-balance" >2000</span>
+                    </div>
+                    <div class="totals">
+                        <div class="total-credit total-item">
+                            <h3 class="highlight">CREDIT</h3>
+                            <span id="total-credit">5000</span>
+                        </div>
+                        <div class="total-debit total-item">
+                            <h3 class="highlight">DEBIT</h3>
+                            <span id="total-debit">3000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class= "transaction__container sep">
+                    <h3>Transactions</h3>
+                    <div class="transactions_box">
+                        <table class="transactions_table">
+                            <thead class="transactions_header">
+                                <tr>
+                                    <th class="table-date">Date</th>
+                                    <th class="table-type">type</th>
+                                    <th class="table-description">description</th>
+                                    <th class="table-amount">amount</th>    
+                                </tr>
+                            </thead>
+                            <tbody class="transactions_body">
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/12/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Shiva</td>
+                                    <td class="transaction-atr ti__amount">3400</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">Roopesh</td>
+                                    <td class="transaction-atr ti__amount">1900</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">varu</td>
+                                    <td class="transaction-atr ti__amount">2030</td>
+                                </tr>
+                                <!-- <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">Roopesh</td>
+                                    <td class="transaction-atr ti__amount">1900</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/12/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Shiva</td>
+                                    <td class="transaction-atr ti__amount">3400</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">Roopesh</td>
+                                    <td class="transaction-atr ti__amount">1900</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">Roopesh</td>
+                                    <td class="transaction-atr ti__amount">1900</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/12/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Shiva</td>
+                                    <td class="transaction-atr ti__amount">3400</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/12/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Shiva</td>
+                                    <td class="transaction-atr ti__amount">3400</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">20/11/20</td>
+                                    <td class="transaction-atr ti__type">credit</td>
+                                    <td class="transaction-atr ti__description">Sai</td>
+                                    <td class="transaction-atr ti__amount">2300</td>
+                                </tr>
+                                <tr>
+                                    <td class="transaction-atr ti__date">14/11/20</td>
+                                    <td class="transaction-atr ti__type">debit</td>
+                                    <td class="transaction-atr ti__description">Roopesh</td>
+                                    <td class="transaction-atr ti__amount">1900</td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="p_all-transactions"><a href="#" class="link_all-transactions">View all</a></p>
+                    <!-- <div class="transactions_header flex">
+                        <p>Date</p>
+                        <p>type</p>
+                        <p>description</p>
+                        <p>amount</p>
+                    </div>
+                    <div class="transactions">
+                        <div class="transaction-item">
+                            <span class="transaction-atr ti__date">20/12/20</span>
+                            <span class="transaction-atr ti__type">debit</span>
+                            <span class="transaction-atr ti__description">Shiva</span>
+                            <span class="transaction-atr ti__amount">3421</span>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="utilities-box sep">
+                    <!-- <div class="new-service new-service--transfer">
+                        <h4 class="service-heading">Transfer money</h4>
+                        <form>
+                            <input
+                                type="text"
+                                placeholder="username"
+                                class="form_field"
+                            />
+                            <input
+                                type="number"
+                                placeholder="amount"
+                                class="form_field"
+                            />
+                            <input
+                                type="text"
+                                placeholder="description"
+                                class="form_field"
+                            />
+                            <button
+                                class="form_field submit-form submit-form--transfer"
+                            >
+                                &rarr;
+                            </button>
+                        </form>
+                    </div> -->
+                    <div class="transfer-money">
+                        <h3 class="util-heading">Transfer money</h3>
+                        <form class="transfer-form">
+                            <input
+                                type="text"
+                                placeholder="username"
+                                class="form_field transfer-form--username"
+                            />
+                            <input
+                                type="number"
+                                placeholder="amount"
+                                class="form_field transfer-form--amount"
+                            />
+                            <input
+                                type="text"
+                                placeholder="description"
+                                class="form_field transfer-form--description"
+                            />
+                            <button
+                                class="btn form_field submit-form submit-form--transfer"
+                            >
+                                &rarr;
+                            </button>
+                        </form>
+                    </div>
+                    <div class="pay-bills">
+                        <h3 class="util-heading">Pay bills</h3>
+                        <form class="transfer-form">
+                            <select
+                                name="bill-type"
+                                id="bill-type"
+                                class="form_field paybill-form--select"
+                            >
+                                <option value="Electricity bill">
+                                    Electricity
+                                </option>
+                                <option value="Mobile recharge">
+                                    Mobile Recharge
+                                </option>
+                                <!-- <option value="Brodband">Brodband</option>
+                                <option value="DTH">DTH</option> -->
+                            </select>
+                            <input
+                                type="number"
+                                placeholder="USC(service) number"
+                                class="form_field paybill-form--service-number"
+                            />
+                            <input
+                                type="number"
+                                placeholder="mobile number"
+                                class="form_field paybill-form--mobile hidden"
+                            />
+                            <input
+                                type="number"
+                                placeholder="amount"
+                                class="form_field paybill-form--amount"
+                            />
+                            <input
+                                type="text"
+                                placeholder="description"
+                                class="form_field paybill-form--description"
+                            />
+                            <button
+                                class="btn form_field submit-form submit-form--paybill"
+                            >
+                                &rarr;
+                            </button>
+                        </form>
+                    </div>
+                    <div class="close-account">
+                        <h3 class="util-heading">Close Account</h3>
+                        <form class="close-form">
+                            <input
+                                type="text"
+                                placeholder="username"
+                                class="form_field close-form--username"
+                            />
+                            <input
+                                type="password"
+                                placeholder="password"
+                                class="form_field close-form--password"
+                            />
+                            <button
+                                class="btn form_field submit-form submit-form--closeAcc"
+                            >
+                                &rarr;
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

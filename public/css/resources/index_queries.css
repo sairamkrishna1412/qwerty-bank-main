@@ -1,0 +1,97 @@
+/* @media only screen and (max-width: 1550px) {
+    .heading__h2 {
+        font-size: 250%;
+    }
+    .heading__image {
+        width: 240px;
+    }
+}
+@media only screen and (max-width: 1390px) {
+    .heading__h2 {
+        font-size: 230%;
+    }
+    .heading__image {
+        width: 220px;
+    }
+}
+@media only screen and (max-width: 1270px) {
+    .heading__h2 {
+        font-size: 210%;
+    }
+    .heading__image {
+        width: 200px;
+    }
+}
+@media only screen and (max-width: 1024px) {
+    .logo {
+        height: 40px;
+        width: auto;
+    }
+    .hero-text {
+        font-size: 140%;
+    }
+    .heading__h2 {
+        font-size: 180%;
+    }
+    .heading__image {
+        width: 170px;
+    }
+    .login-new-form {
+        width: 50%;
+    }
+}
+@media only screen and (max-width: 975px) {
+    .hero-text {
+        font-size: 120%;
+    }
+} */
+
+@media only screen and (max-width: 480px){
+    h2{
+        font-size: 2.7rem;
+        word-spacing: initial;
+        letter-spacing: initial;
+    }
+    section{
+        padding: 1rem 0;
+    }
+    .row{
+        width: 90%
+    }
+    /* .logo{
+        width: 4rem;
+        height: auto;
+    } */
+    .hero-text {
+    font: italic normal 400 2rem "Poppins", sans-serif;
+    }
+    nav .row{
+        max-width: 100%;
+    }
+    .header-body {
+        padding: 10vh 0;
+    }
+    .image{
+        /* max-width: 10rem; */
+        height: auto;
+    }
+    .image__heading{
+        width: 15rem;
+        height: 13rem;
+    }
+    .container {
+        font-size: 1.4rem;
+    }
+    .container  div {
+        flex: 100%;
+    }
+    .feature{
+        padding: 2rem 0;
+    }
+    .icon-image{
+        width: 10rem;
+    }
+    footer{
+        font-size: 1rem;
+    }
+}   
