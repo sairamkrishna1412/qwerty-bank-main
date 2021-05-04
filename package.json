@@ -17,7 +17,12 @@
   },
   "homepage": "https://github.com/sairamkrishna1412/qwerty-bank-main#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.12.7"
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.7",
+    "morgan": "^1.10.0",
+    "validator": "^13.6.0"
   }
 }
