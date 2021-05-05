@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/sairamkrishna1412/qwerty-bank-main#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.2",
     "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

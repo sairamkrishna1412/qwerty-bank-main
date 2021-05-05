@@ -1,9 +1,10 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
-const app = require("./app");
-
+//this must be before we require app. only then morgan will be able to log
 dotenv.config({ path: "./config.env" });
+
+const app = require("./app");
 
 const DB = process.env.DATABASE.replace(
     "<PASSWORD>",
