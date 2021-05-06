@@ -1,10 +1,14 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const mongoose = require("mongoose");
+const ObjectId = require("mongodb").ObjectId;
 
-const User = require("../models/userModels");
+const User = require("../models/userModel");
+const Verify = require("../models/verifyModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const { sendMail } = require("../utils/sendEmail");
 
 function signToken(id) {
     return jwt.sign({ id: id }, process.env.JWT_SECRET_KEY, {
@@ -26,6 +30,16 @@ function createAndSendJWT(user, statusCode, req, res) {
     });
 }
 
+async function createVerifyToken(user) {
+    const randomBytes = crypto.randomBytes(64).toString("hex");
+    const hash = crypto.createHash("sha256").update(randomBytes).digest("hex");
+    await Verify.create({
+        hash,
+        userID: user.id,
+    });
+    return randomBytes;
+}
+
 exports.signup = catchAsync(async function (req, res, next) {
     const user = await User.create({
         name: req.body.name,
@@ -37,6 +51,46 @@ exports.signup = catchAsync(async function (req, res, next) {
     if (!user)
         next(new AppError("Something went wrong! please try again.", 400));
 
+    const verifyToken = await createVerifyToken(user);
+    const url = `${req.protocol}://${req.get(
+        "host"
+    )}/users/verify/${verifyToken}`;
+    await sendMail(user, url, "verify");
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            message: `Sent verfication link to ${user.email}. please send get request to that url`,
+        },
+    });
+});
+
+exports.verifySignup = catchAsync(async function (req, res, next) {
+    if (!req.params.token) {
+        return next(new AppError("Verification token is missing", 400));
+    }
+
+    const encryptedToken = crypto
+        .createHash("sha256")
+        .update(req.params.token)
+        .digest("hex");
+
+    const verified = await Verify.findOneAndUpdate(
+        { hash: encryptedToken },
+        { verfied: true },
+        { new: true }
+    );
+    if (!verified)
+        return next(new AppError("Token is manipulated. try again!"));
+
+    const user = await User.findByIdAndUpdate(
+        verified.userID,
+        { active: true },
+        { new: true }
+    );
+
+    const url = `${req.protocol}://${req.get("host")}/`;
+    sendMail(user, url, "welcome");
     createAndSendJWT(user, 201, req, res);
 });
 
@@ -48,7 +102,8 @@ exports.login = async function (req, res, next) {
 
     //2. check if user exists
     const user = await User.findOne({ email: email }).select("+password");
-    if (!user) next(new AppError("user does not exist. Please sign up", 404));
+    if (!user || !user.active)
+        next(new AppError("user does not exist. Please sign up", 404));
 
     //3.check if passwords match
     const passMatch = await user.checkPassword(password, user.password);
@@ -108,4 +163,25 @@ exports.protect = async function (req, res, next) {
     res.user = user;
     res.locals.user = user;
     next();
+};
+
+exports.forgotPassword = function (req, res, next) {};
+
+exports.resetPassword = function (req, res, next) {};
+
+//Grant permission to certain resoures to only authorized personnel
+//in middleware we call this is how we call it : app.use(restrictTo("users"))
+//restrictTo("users") then returns another function which doesn't get called away. but is invoked when a new request is made to a protected route.
+exports.restrictTo = function (...roles) {
+    return function (req, res, next) {
+        if (!roles.includes(req.user.role)) {
+            return next(
+                new AppError(
+                    "You are not authorized to perform this action",
+                    401
+                )
+            );
+        }
+        next();
+    };
 };

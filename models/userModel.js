@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
     passwordResetToken: String,
     active: {
         type: Boolean,
-        default: true,
+        default: false,
         select: false,
     },
 });
@@ -62,6 +62,11 @@ userSchema.pre("save", async function (next) {
     this.confirmPassword = undefined;
     next();
 });
+
+// userSchema.pre(/^find/, function (next) {
+//     this.find({ active: { $ne: false } });
+//     next();
+// });
 
 userSchema.methods.checkPassword = async function (
     givenPassword,

@@ -9,6 +9,9 @@ const AppError = require("./utils/appError");
 const app = express();
 
 //middleware
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
