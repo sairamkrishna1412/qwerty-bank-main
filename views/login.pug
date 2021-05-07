@@ -1,0 +1,14 @@
+extends base
+block content
+    section.section-authenticate.row.flex
+        .div-authenticate
+            h2.heading.heading__form.heading__login Login
+            .autenticate-container
+                form.from__auth.form__login
+                    .input-box
+                        label(for='email') Email
+                        input#email.input.input__login(type='email' required='')
+                    .input-box
+                        label(for='password') Password
+                        input#password.input.input__login(type='password' minlength='8' required='')
+                    input.btn.btn__login(type='submit' value='Log in')

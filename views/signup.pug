@@ -1,0 +1,20 @@
+extends base
+block content
+    section.section-authenticate.row.flex
+        .div-authenticate
+            h2.heading.heading__form.heading__login Sign up
+            .autenticate-container
+                form.form__auth.form__signup
+                    .input-box
+                        label(for='email') Email
+                        input#email.input.input__signup(type='email' required='')
+                    .input-box
+                        label(for='name') Name
+                        input#name.input.input__signup(type='text' required='')
+                    .input-box
+                        label(for='password') Password
+                        input#password.input.input__signup(type='password' minlength='8' required='')
+                    .input-box
+                        label(for='confirm-password') Confirm password
+                        input#confirm-password.input.input__signup(type='password' minlength='8' required='')
+                    input.btn.btn__signup(type='submit' value='Sign up')

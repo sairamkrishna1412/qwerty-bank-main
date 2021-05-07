@@ -1,0 +1,84 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+        link(rel='stylesheet' href='/css/resources/index_style.css' type='text/css')
+        link(rel='stylesheet' href='/css/resources/index_queries.css' type='text/css')
+        link(rel='shortcut icon' type='image/png' href='../img/banking_logo.png')
+        title Qwerty Bank
+    body
+        header
+            nav
+                .row.flex.nav-bar
+                    .hero-text-box
+                        h1.hero-text
+                            a(href='./') Qwerty Bank
+                    ul.nav-main
+                        // <li><a href="./allCustomers.html">All customers</a></li>
+                        li
+                            a.btn.nav__login(href='/login') Login
+                        li
+                            a.btn.nav__signup(href='/signup') Sign up
+            .header-body.row
+                //- <div class="heading">
+                //-     <h2 class="heading__h2">
+                //-         Where
+                //-         <span class="heading__highlight">banking</span>
+                //-         <br />is as quick & effortless<br/> as
+                //-         <span class="heading__highlight">blinking</span>
+                //-     </h2>
+                //-     <img
+                //-         src="../img/main-heading-img.jpg"
+                //-         alt="main-img"
+                //-         class="image image__heading"
+                //-     />
+                //- </div>
+                .heading
+                    h2.heading__h2
+                        | Where 
+                        span.heading__highlight  banking
+                        br
+                        | is as quick & effortless
+                        br
+                        |  as 
+                        span.heading__highlight  blinking
+                    img.image.image__heading(src='../img/main-heading-img.jpg' alt='main-img')
+        section.features-content.row
+            // <h2>welcome !</h2>
+            .container.container__feature
+                .feature
+                    img.icon-image(src='../img/banking_feature_1.png' alt='feature_1')
+                    h3.feature-heading Convenient
+                    p.feature-description
+                        | Bank from your home, office or on the go 24x7 .
+                        br
+                        | Make secure payments from your Qbank app or using
+                        |                     internet banking.
+                .feature
+                    img.icon-image(src='../img/upi_logo-final.png' alt='feature_1')
+                    h3.feature-heading Bank to Bank Transfer
+                    p.feature-description
+                        | Transfer money from bank to bank within seconds.
+                        br
+                        | Fastest payments than ever with all new QPI.
+                .feature
+                    img.icon-image(src='../img/rupee-final.png' alt='feature_1')
+                    h3.feature-heading Secure
+                    p.feature-description
+                        | Assured with the highest levels of security. 
+                        br
+                        |  Smooth and safe payments. 
+                        br
+                        |  All payments will be updated in transaction summary.
+                .feature
+                    img.icon-image(src='../img/bill_logo-final.png' alt='feature_1')
+                    h3.feature-heading Convenient
+                    p.feature-description
+                        | All types of bill payments can be done. 
+                        br
+                        |  Perform a range of transactions
+        footer
+            .row
+                p.author-name Sai ram krishna Durgi.
+                p Copyright © 2021 by Qwerty Bank. All rights reserved.
