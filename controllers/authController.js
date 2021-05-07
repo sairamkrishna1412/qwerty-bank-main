@@ -78,7 +78,8 @@ exports.signup = catchAsync(async function (req, res, next) {
     if (verifyExists)
         return next(
             new AppError(
-                "we've already sent a verfication email which is still valid. please check your email."
+                "we've already sent a verfication email which is still valid. please check your email.",
+                400
             )
         );
 
@@ -114,7 +115,7 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
     );
     // console.log(verified);
     if (!verified)
-        return next(new AppError("Token is manipulated. try again!"));
+        return next(new AppError("Token is manipulated. try again!", 400));
 
     const user = await User.findByIdAndUpdate(
         verified.userID,
@@ -171,7 +172,10 @@ exports.protect = catchAsync(async function (req, res, next) {
 
     if (!token)
         return next(
-            new AppError("you are not authorized. please log in to continue.")
+            new AppError(
+                "you are not authorized. please log in to continue.",
+                400
+            )
         );
 
     //2.check token
@@ -181,7 +185,10 @@ exports.protect = catchAsync(async function (req, res, next) {
     );
     if (!decoded)
         return next(
-            new AppError("you are not authorized. please log in to continue.")
+            new AppError(
+                "you are not authorized. please log in to continue.",
+                400
+            )
         );
 
     //3.check if user changed password after issue of token.
@@ -189,15 +196,15 @@ exports.protect = catchAsync(async function (req, res, next) {
 
     if (!user)
         return next(
-            new AppError("This user is deleted. please login / sign up")
+            new AppError("This user is deleted. please login / sign up", 400)
         );
 
     const changedPassword = user.changedPassword(decoded.iat);
     if (changedPassword)
-        return next(new AppError("Session expired. please log in again"));
+        return next(new AppError("Session expired. please log in again", 400));
 
     //GRANT PERMISSION ONLY IF ALL CONDITIONS ARE SATISFIED
-    res.user = user;
+    req.user = user;
     res.locals.user = user;
     next();
 });
@@ -231,7 +238,7 @@ exports.forgotPassword = catchAsync(async function (req, res, next) {
 
 exports.resetPassword = catchAsync(async function (req, res, next) {
     const { token } = req.params;
-    if (!token) return new AppError("Please enter a valid token");
+    if (!token) return next(new AppError("Please enter a valid token", 400));
 
     const encryptedToken = crypto
         .createHash("sha256")
@@ -291,3 +298,29 @@ exports.restrictTo = function (...roles) {
         next();
     };
 };
+
+exports.updatePassword = catchAsync(async function (req, res, next) {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmNewPassword)
+        return next(new AppError("Please fill all Fields", 400));
+
+    const user = await User.findById(req.user.id).select("+password");
+    console.log(user);
+    if (!user)
+        return next(new AppError("You are not loggeg in. please login", 400));
+
+    const passwordMatch = await user.checkPassword(
+        currentPassword,
+        user.password
+    );
+    if (!passwordMatch)
+        return next(new AppError("Incorrect password. Retry", 400));
+
+    user.password = newPassword;
+    user.confirmPassword = confirmNewPassword;
+    await user.save();
+
+    //As password is updated we need to send new token
+    createAndSendJWT(user, 200, req, res);
+});
