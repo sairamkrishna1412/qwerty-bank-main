@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 
 const userRouter = require("./routes/userRoutes");
+const viewRouter = require("./routes/viewRoutes");
 const errorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 
@@ -22,7 +23,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "10kb" }));
 
 //ROUTES
-// app.use("/", viewRouter);
+app.use("/", viewRouter);
 app.use("/users", userRouter);
 
 app.use("*", (req, res, next) => {

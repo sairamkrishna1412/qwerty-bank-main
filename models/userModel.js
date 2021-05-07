@@ -63,6 +63,12 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
+userSchema.pre("save", function (next) {
+    if (!this.isModified("password") || this.isNew) return next();
+
+    this.passwordChangedAt = Date.now() - 1000;
+    next();
+});
 // userSchema.pre(/^find/, function (next) {
 //     this.find({ active: { $ne: false } });
 //     next();
@@ -75,7 +81,7 @@ userSchema.methods.checkPassword = async function (
     return await bcrypt.compare(givenPassword, encryptedPassword);
 };
 
-userSchema.changedPassword = function (JWTTimeStamp) {
+userSchema.methods.changedPassword = function (JWTTimeStamp) {
     //check if user changed password
     if (this.passwordChangedAt) {
         const passwordChangedAtTimeStamp = parseInt(
@@ -85,6 +91,14 @@ userSchema.changedPassword = function (JWTTimeStamp) {
         return JWTTimeStamp < passwordChangedAtTimeStamp;
     }
     return false;
+};
+
+userSchema.methods.saveResetToken = async function (hash) {
+    this.passwordResetToken = hash;
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    await this.save({
+        validateBeforeSave: false,
+    });
 };
 
 const User = mongoose.model("User", userSchema);

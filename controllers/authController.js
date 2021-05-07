@@ -30,10 +30,20 @@ function createAndSendJWT(user, statusCode, req, res) {
     });
 }
 
-async function createVerifyToken(user) {
+function createRandomHash(len = 64, alg = "sha256") {
     const randomBytes = crypto.randomBytes(64).toString("hex");
     const hash = crypto.createHash("sha256").update(randomBytes).digest("hex");
-    await Verify.create({
+    return [randomBytes, hash];
+}
+
+function createUrl(req, path) {
+    const url = `${req.protocol}://${req.get("host")}${path}`;
+    return url;
+}
+
+async function createVerifyToken(user) {
+    const [randomBytes, hash] = createRandomHash();
+    const verify = await Verify.create({
         hash,
         userID: user.id,
     });
@@ -41,26 +51,48 @@ async function createVerifyToken(user) {
 }
 
 exports.signup = catchAsync(async function (req, res, next) {
-    const user = await User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        confirmPassword: req.body.confirmPassword,
-        role: req.body.role,
-    });
+    let user;
+    user = await User.findOne({ email: req.body.email }).select("+active");
+    if (user) {
+        user.password = req.body.password;
+        user.confirmPassword = req.body.confirmPassword;
+        await user.save();
+    }
     if (!user)
-        next(new AppError("Something went wrong! please try again.", 400));
+        user = await User.create({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            confirmPassword: req.body.confirmPassword,
+            role: req.body.role,
+        });
+    if (!user)
+        return next(
+            new AppError("Something went wrong! please try again.", 400)
+        );
+
+    if (user.active)
+        return next(new AppError("User with this mail already exists.", 400));
+
+    const verifyExists = await Verify.findOne({ userID: user.id });
+    if (verifyExists)
+        return next(
+            new AppError(
+                "we've already sent a verfication email which is still valid. please check your email."
+            )
+        );
 
     const verifyToken = await createVerifyToken(user);
-    const url = `${req.protocol}://${req.get(
-        "host"
-    )}/users/verify/${verifyToken}`;
+    // const url = `${req.protocol}://${req.get(
+    //     "host"
+    // )}/users/verify/${verifyToken}`;
+    const url = createUrl(req, `/users/verify/${verifyToken}`);
     await sendMail(user, url, "verify");
 
     res.status(200).json({
         status: "success",
         data: {
-            message: `Sent verfication link to ${user.email}. please send get request to that url`,
+            message: `Sent verfication link to ${user.email}. please send get request to that url. Verfication link valid for 15 mins.`,
         },
     });
 });
@@ -77,9 +109,10 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
 
     const verified = await Verify.findOneAndUpdate(
         { hash: encryptedToken },
-        { verfied: true },
+        { verified: true },
         { new: true }
     );
+    // console.log(verified);
     if (!verified)
         return next(new AppError("Token is manipulated. try again!"));
 
@@ -98,17 +131,19 @@ exports.login = async function (req, res, next) {
     //1.get user details
     const { email, password } = req.body;
     if (!email || !password)
-        next(new AppError("Please provide email and password", 400));
+        return next(new AppError("Please provide email and password", 400));
 
     //2. check if user exists
-    const user = await User.findOne({ email: email }).select("+password");
+    const user = await User.findOne({ email: email }).select(
+        "+password +active"
+    );
     if (!user || !user.active)
-        next(new AppError("user does not exist. Please sign up", 404));
+        return next(new AppError("User does not exist. Please sign up", 404));
 
     //3.check if passwords match
     const passMatch = await user.checkPassword(password, user.password);
     if (!passMatch)
-        next(new AppError("Incorrect Password. please try again", 400));
+        return next(new AppError("Incorrect Password. please try again", 400));
 
     //2.send jwt token after authenticating.
     createAndSendJWT(user, 200, req, res);
@@ -122,7 +157,7 @@ exports.logout = async function (req, res, next) {
     res.status(200).json({ status: "success" });
 };
 
-exports.protect = async function (req, res, next) {
+exports.protect = catchAsync(async function (req, res, next) {
     let token;
     //1.check if jwt token is present
     if (
@@ -135,7 +170,7 @@ exports.protect = async function (req, res, next) {
     }
 
     if (!token)
-        next(
+        return next(
             new AppError("you are not authorized. please log in to continue.")
         );
 
@@ -145,7 +180,7 @@ exports.protect = async function (req, res, next) {
         process.env.JWT_SECRET_KEY
     );
     if (!decoded)
-        next(
+        return next(
             new AppError("you are not authorized. please log in to continue.")
         );
 
@@ -153,21 +188,92 @@ exports.protect = async function (req, res, next) {
     const user = await User.findById(decoded.id);
 
     if (!user)
-        next(new AppError("This user is deleted. please login / sign up"));
+        return next(
+            new AppError("This user is deleted. please login / sign up")
+        );
 
     const changedPassword = user.changedPassword(decoded.iat);
     if (changedPassword)
-        next(new AppError("Session expired. please log in again"));
+        return next(new AppError("Session expired. please log in again"));
 
     //GRANT PERMISSION ONLY IF ALL CONDITIONS ARE SATISFIED
     res.user = user;
     res.locals.user = user;
     next();
-};
+});
 
-exports.forgotPassword = function (req, res, next) {};
+exports.forgotPassword = catchAsync(async function (req, res, next) {
+    //1.check if user exists and active
+    const { email } = req.body;
+    if (!email) return next(new AppError("Please provide an email", 400));
 
-exports.resetPassword = function (req, res, next) {};
+    const user = await User.findOne({ email }).select("+active");
+    console.log(user);
+    if (!user || !user.active) {
+        return next(new AppError("No user found.", 404));
+    }
+    //2.create random hash
+    const [randomBytes, hash] = createRandomHash();
+    await user.saveResetToken(hash);
+
+    //3.send random hash to user
+    const url = createUrl(req, `/users/resetPassword/${randomBytes}`);
+    console.log(url);
+
+    await sendMail(user, url, "resetPassword");
+    res.status(200).json({
+        status: "success",
+        data: {
+            message: `Sent Password Reset link to ${user.email}. please send patch request with password and confirm password to that url. Reset link valid for 10 mins`,
+        },
+    });
+});
+
+exports.resetPassword = catchAsync(async function (req, res, next) {
+    const { token } = req.params;
+    if (!token) return new AppError("Please enter a valid token");
+
+    const encryptedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+    const user = await User.findOne({ passwordResetToken: encryptedToken });
+
+    if (!user) return next(new AppError("Invalid Reset link.", 400));
+
+    if (user.passwordResetExpires.getTime() < new Date().getTime())
+        return next(
+            new AppError(
+                "This Reset link expired. please generate new password reset link.",
+                400
+            )
+        );
+
+    // const user = await User.findOne({
+    //     passwordResetToken: encryptedToken,
+    //     passwordResetExpires: {
+    //         $gt: Date.now(),
+    //     },
+    // });
+    // if (!user)
+    //     return next(
+    //         new AppError(
+    //             "Invalid Reset link. please generate new password reset link.",
+    //             400
+    //         )
+    //     );
+
+    const { password, confirmPassword } = req.body;
+
+    user.password = password;
+    user.confirmPassword = confirmPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    createAndSendJWT(user, 200, req, res);
+});
 
 //Grant permission to certain resoures to only authorized personnel
 //in middleware we call this is how we call it : app.use(restrictTo("users"))
