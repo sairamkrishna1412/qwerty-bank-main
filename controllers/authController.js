@@ -6,6 +6,7 @@ const ObjectId = require("mongodb").ObjectId;
 
 const User = require("../models/userModel");
 const Verify = require("../models/verifyModel");
+const Transaction = require("../models/transactionModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendMail } = require("../utils/sendEmail");
@@ -50,6 +51,20 @@ async function createVerifyToken(user) {
     return randomBytes;
 }
 
+async function signUpBonus(user) {
+    const amount = 19000;
+    const transaction = await Transaction.create({
+        sender: user.id,
+        recipient: user.id,
+        amount,
+        remarks: "Sign up Bonus!",
+    });
+
+    user.transactions.credit.push(transaction);
+    user.transactions.total = amount;
+    await user.save({ validateBeforeSave: false });
+}
+
 exports.signup = catchAsync(async function (req, res, next) {
     let user;
     user = await User.findOne({ email: req.body.email }).select("+active");
@@ -88,6 +103,7 @@ exports.signup = catchAsync(async function (req, res, next) {
     //     "host"
     // )}/users/verify/${verifyToken}`;
     const url = createUrl(req, `/users/verify/${verifyToken}`);
+    // console.log(url);
     await sendMail(user, url, "verify");
 
     res.status(200).json({
@@ -122,7 +138,7 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
         { active: true },
         { new: true }
     );
-
+    await signUpBonus(user);
     const url = `${req.protocol}://${req.get("host")}/`;
     sendMail(user, url, "welcome");
     createAndSendJWT(user, 201, req, res);

@@ -4,7 +4,8 @@
   "description": "Internet Banking Application",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "Sai ram krishna",
   "license": "ISC",
@@ -26,5 +27,8 @@
     "morgan": "^1.10.0",
     "pug": "^3.0.2",
     "validator": "^13.6.0"
+  },
+  "engines": {
+    "node": "^14"
   }
 }

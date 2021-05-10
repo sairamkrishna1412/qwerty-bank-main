@@ -42,6 +42,28 @@ const userSchema = new mongoose.Schema({
             message: "Passwords do not match.",
         },
     },
+    // balance: {
+    //     type: Number,
+    //     default: 10000,
+    // },
+    transactions: {
+        total: {
+            type: Number,
+            default: 0,
+        },
+        credit: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Transaction",
+            },
+        ],
+        debit: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Transaction",
+            },
+        ],
+    },
     passwordChangedAt: {
         type: Date,
     },
@@ -55,8 +77,9 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-
+    if (!this.isModified("password")) {
+        return next();
+    }
     //encrypt password with cost 12 and remove confirm password
     this.password = await bcrypt.hash(this.password, 12);
     this.confirmPassword = undefined;
@@ -69,10 +92,6 @@ userSchema.pre("save", function (next) {
     this.passwordChangedAt = Date.now() - 1000;
     next();
 });
-// userSchema.pre(/^find/, function (next) {
-//     this.find({ active: { $ne: false } });
-//     next();
-// });
 
 userSchema.methods.checkPassword = async function (
     givenPassword,

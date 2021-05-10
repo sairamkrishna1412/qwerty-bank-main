@@ -4,6 +4,7 @@ const morgan = require("morgan");
 
 const userRouter = require("./routes/userRoutes");
 const viewRouter = require("./routes/viewRoutes");
+const transactionRouter = require("./routes/transactionRoutes");
 const errorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 
@@ -25,6 +26,7 @@ app.use(express.json({ limit: "10kb" }));
 //ROUTES
 app.use("/", viewRouter);
 app.use("/users", userRouter);
+app.use("/transaction", transactionRouter);
 
 app.use("*", (req, res, next) => {
     next(
