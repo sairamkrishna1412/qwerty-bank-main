@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon server.js",
+    "dev": "webpack --mode development",
+    "watch": "webpack --progress --watch --mode development",
     "debug": "ndb server.js"
   },
   "author": "Sai ram krishna",
@@ -19,16 +21,32 @@
   "homepage": "https://github.com/sairamkrishna1412/qwerty-bank-main#readme",
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.7",
     "morgan": "^1.10.0",
     "pug": "^3.0.2",
+    "regenerator-runtime": "^0.13.7",
     "validator": "^13.6.0"
   },
   "engines": {
     "node": "^14"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
+    "babel-loader": "^8.2.2",
+    "core-js": "^3.12.1",
+    "css-loader": "^5.2.4",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.37.0",
+    "webpack-bundle-analyzer": "^4.4.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
