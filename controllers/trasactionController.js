@@ -8,17 +8,17 @@ function CalcTotal(prevTotal, num) {
 }
 
 exports.newTransaction = catchAsync(async function (req, res, next) {
-    const recipentEmail = req.body.email;
+    const recipientEmail = req.body.email;
     const amount = req.body.amount;
     const remarks = req.body.remarks;
-    if (!recipentEmail)
+    if (!recipientEmail)
         return next(new AppError("Enter a recipient email Id", 400));
     if (!amount) return next(new AppError("Enter amount", 400));
 
     const sender = await User.findById(req.user.id);
     if (!sender) return next(new AppError("Sender error"));
 
-    const recipient = await User.findOne({ email: recipentEmail });
+    const recipient = await User.findOne({ email: recipientEmail });
     if (!recipient) return next(new AppError("Recipient does not exist", 400));
 
     if (sender.email === recipient.email)
@@ -34,6 +34,7 @@ exports.newTransaction = catchAsync(async function (req, res, next) {
     const transaction = await Transaction.create({
         sender: sender.id,
         recipient: recipient.id,
+        recipientEmail,
         amount,
         remarks,
     });
@@ -60,6 +61,32 @@ exports.newTransaction = catchAsync(async function (req, res, next) {
     });
 });
 
+// class Features {
+//     constructor(query, queryStr) {
+//         this.query = query;
+//         this.queryStr = queryStr;
+//     }
+
+//     sort() {
+//         if (this.queryStr.sort) {
+//             const sortBy = this.queryStr.split(",").join(" ");
+//             this.query = this.query.sort(sortBy);
+//         } else {
+//             this.query = this.query.sort("");
+//         }
+//         return this;
+//     }
+
+//     limitFields() {
+//         if (this.queryStr.fields) {
+//             const selectFields = this.queryStr.split(",").join(" ");
+//             this.query = this.query.select(selectFields);
+//         } else {
+//             this.query = this.query.select("-__v");
+//         }
+//     }
+// }
+
 exports.myTransactions = catchAsync(async function (req, res, next) {
     const user = await User.findById(req.user.id)
         .populate("transactions.credit")
@@ -67,15 +94,23 @@ exports.myTransactions = catchAsync(async function (req, res, next) {
 
     const credit = user.transactions.credit;
     const debit = user.transactions.debit;
+    const total = user.transactions.total;
+
+    let creditTotal = 0;
+    let debitTotal = 0;
 
     credit.forEach((el) => {
+        creditTotal += el.amount;
         el.type = "credit";
     });
     debit.forEach((el) => {
+        debitTotal += el.amount;
         el.type = "debit";
     });
 
     const allTransactions = credit.concat(debit);
+
+    //sorting in desending order
     allTransactions.sort(function (a, b) {
         return b.date - a.date;
     });
@@ -84,6 +119,9 @@ exports.myTransactions = catchAsync(async function (req, res, next) {
         status: "success",
         results: allTransactions.length,
         data: {
+            total,
+            creditTotal,
+            debitTotal,
             transactions: allTransactions,
         },
     });
@@ -185,7 +223,7 @@ exports.deleteTransaction = catchAsync(async function (req, res, next) {
     const recipient = await User.findById(transaction.recipient);
 
     // const senderTransactionIndex = sender.tranactions.debit.indexOf(transaction.id);
-    // const recipentTransactionIndex = recipient.tranactions.credit.indexOf(transaction.id);
+    // const recipientTransactionIndex = recipient.tranactions.credit.indexOf(transaction.id);
     sender.transactions.debit.filter((item) => item !== transaction.id);
     recipient.transactions.credit.filter((item) => item !== transaction.id);
 

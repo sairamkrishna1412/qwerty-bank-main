@@ -15,8 +15,10 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 
 router.use(authController.protect);
 
+router.patch("/updateMe", authController.updateMe);
 router.patch("/updatePassword", authController.updatePassword);
 router.get("/me", userController.getMe, userController.getUser);
+router.post("/closeAcc", authController.checkAndDeleteUser);
 // router.patch("/updateMe", userController)
 
 router.use(authController.restrictTo("admin"));

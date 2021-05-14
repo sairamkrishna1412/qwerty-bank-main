@@ -6,6 +6,10 @@ header
                     a(href='/') Qwerty Bank
             ul.nav-main
                 li
-                    a.btn.nav__login(href='/login') Login
+                    if  user
+                        button.btn.nav__logout Log out
+                    else
+                        a.btn.nav__login(href='/login') Login
                 li
-                    a.btn.nav__signup(href='/signup') Sign up
+                    -if(!user)
+                        a.btn.nav__signup(href='/signup') Sign up

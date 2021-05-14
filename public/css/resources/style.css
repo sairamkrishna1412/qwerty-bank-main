@@ -33,7 +33,7 @@ table{
 td,
 th {
     text-align: center;
-    padding: 5px 10px;
+    padding: 10px 10px;
 }
 
 /*Utilities*/
@@ -62,12 +62,21 @@ th {
 }
 
 .btn:focus {
-  outline: none;
-  background-color: var(--primary-color);
+    outline: none;
+    background-color: var(--primary-color);
 }
 
 .btn:active{
     transform: scale(0.9);
+}
+
+
+.verify-div{
+    height: 80vh;
+    justify-content: center;
+}
+.email-text{
+    font-size: 3rem;
 }
 
 /*-------HEADING-----------*/
@@ -89,6 +98,9 @@ span{
 }
 p{
     font-size: 1.5rem
+}
+body{
+    margin-bottom: 40px;
 }
 /*----------------------------
 ----------HEADER------------
@@ -146,15 +158,21 @@ form input{
     transition: all 0.3s;
 }
 form input:focus{
-    border: 2px solid var(--primary-color);
+    border: 2px solid inherit;
     box-shadow: 0 0 10px #d3d3d3;
 }
-form input[type='submit']{
+form button[type='submit']{
     display: block;
     width: 70%;
     margin: 3rem auto;
     text-transform: uppercase;
 }
+/* form input[type='submit']{
+    display: block;
+    width: 70%;
+    margin: 3rem auto;
+    text-transform: uppercase;
+} */
 form label{
     display: block;
     font-size: 1.3rem;
@@ -183,6 +201,18 @@ form input:focus{
 .form__auth{
     max-width: 320px;
 }
+.form__auth input:focus {
+    border: 2px solid var(--primary-color);
+}
+.spinner-hidden{
+    display : none;
+}
+/* .form__auth input[type="submit"]{
+    display: block;
+    width: 70%;
+    margin: 3rem auto;
+    text-transform: uppercase;
+} */
 /*---user-data----*/
 
 .user-profile{
@@ -284,6 +314,7 @@ form input:focus{
 }
 .transactions_body tr{
     width: 100%;
+    font-size: 1.3rem;
 }
 .transactions_body td{
     overflow: hidden;
@@ -338,6 +369,14 @@ form input:focus{
 }
 .paybill-form--select{
     height: 3rem;
+}
+
+.util-form .btn{
+    background-color: transparent;
+    max-width: 300px;
+}
+.util-form .btn:focus{
+    background-color: transparent;
 }
 
 .transfer-money{
@@ -399,9 +438,13 @@ form input:focus{
 }
 .btn__user-profile{
     display: block;
-    width: auto !important;
+    width: 14rem !important;
     height: 40px;
     padding: 1rem;
     border-radius: 40px;
     margin-right: 2rem !important;
+}
+
+.hidden{
+    display: none;
 }

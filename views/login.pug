@@ -4,11 +4,27 @@ block content
         .div-authenticate
             h2.heading.heading__form.heading__login Login
             .autenticate-container
-                form.from__auth.form__login
+                form.form__auth.form__login
                     .input-box
                         label(for='email') Email
                         input#email.input.input__login(type='email' required='')
                     .input-box
                         label(for='password') Password
                         input#password.input.input__login(type='password' minlength='8' required='')
-                    input.btn.btn__login(type='submit' value='Log in')
+                    //- i.fa.fa-spinner.fa-spin.spinner
+                    //- input.btn.btn__login(type='submit' value='Log in')
+                    button.btn.btn__login(type='submit') Log In &nbsp;
+                        //- i.fa.fa-spinner.fa-spin.spinner
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
+
+
+
+
+                    //- button can also have type submit
+
+
+
+                    //- button.btn.buttonload
+                    //-     i.fa.fa-spinner.fa-spin
+                    //-     |   Loading
+    //- button.btn.btn__login Login

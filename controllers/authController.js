@@ -19,6 +19,13 @@ function signToken(id) {
 
 function createAndSendJWT(user, statusCode, req, res) {
     const token = signToken(user.id);
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+    res.cookie("jwt", token, cookieOptions);
     //removing user password from output.
     user.password = undefined;
 
@@ -56,6 +63,7 @@ async function signUpBonus(user) {
     const transaction = await Transaction.create({
         sender: user.id,
         recipient: user.id,
+        recipientEmail: user.email,
         amount,
         remarks: "Sign up Bonus!",
     });
@@ -90,14 +98,20 @@ exports.signup = catchAsync(async function (req, res, next) {
         return next(new AppError("User with this mail already exists.", 400));
 
     const verifyExists = await Verify.findOne({ userID: user.id });
-    if (verifyExists)
-        return next(
-            new AppError(
-                "we've already sent a verfication email which is still valid. please check your email.",
-                400
-            )
-        );
-
+    if (verifyExists) {
+        res.status(200).json({
+            status: "success",
+            data: {
+                message: `We've already sent a verification email which is still valid. please check your email`,
+            },
+        });
+        // return next(
+        //     new AppError(
+        //         "we've already sent a verification email which is still valid. please check your email.",
+        //         400
+        //     )
+        // );
+    }
     const verifyToken = await createVerifyToken(user);
     // const url = `${req.protocol}://${req.get(
     //     "host"
@@ -109,14 +123,14 @@ exports.signup = catchAsync(async function (req, res, next) {
     res.status(200).json({
         status: "success",
         data: {
-            message: `Sent verfication link to ${user.email}. please send get request to that url. Verfication link valid for 15 mins.`,
+            message: `We've sent a verification link to ${user.email}. Valid for 15 mins.`,
         },
     });
 });
 
 exports.verifySignup = catchAsync(async function (req, res, next) {
     if (!req.params.token) {
-        return next(new AppError("Verification token is missing", 400));
+        return next(new AppError("Wrong link. try again!", 400));
     }
 
     const encryptedToken = crypto
@@ -130,8 +144,7 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
         { new: true }
     );
     // console.log(verified);
-    if (!verified)
-        return next(new AppError("Token is manipulated. try again!", 400));
+    if (!verified) return next(new AppError("Wrong link. try again!", 400));
 
     const user = await User.findByIdAndUpdate(
         verified.userID,
@@ -141,34 +154,29 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
     await signUpBonus(user);
     const url = `${req.protocol}://${req.get("host")}/`;
     sendMail(user, url, "welcome");
-    createAndSendJWT(user, 201, req, res);
+    // createAndSendJWT(user, 200, req, res);
+
+    const token = signToken(user.id);
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+    res.cookie("jwt", token, cookieOptions);
+
+    res.redirect("/account");
 });
 
-exports.login = async function (req, res, next) {
-    //1.get user details
-    const { email, password } = req.body;
-    if (!email || !password)
-        return next(new AppError("Please provide email and password", 400));
-
-    //2. check if user exists
-    const user = await User.findOne({ email: email }).select(
-        "+password +active"
-    );
-    if (!user || !user.active)
-        return next(new AppError("User does not exist. Please sign up", 404));
-
-    //3.check if passwords match
-    const passMatch = await user.checkPassword(password, user.password);
-    if (!passMatch)
-        return next(new AppError("Incorrect Password. please try again", 400));
-
+exports.login = catchAsync(async function (req, res, next) {
+    const user = await checkUser(req, res, next);
     //2.send jwt token after authenticating.
     createAndSendJWT(user, 200, req, res);
-};
+});
 
 exports.logout = async function (req, res, next) {
     res.cookie("jwt", "logout", {
-        expires: new Date(Date.now() + 10 * 1000),
+        expires: new Date(Date.now()),
         httpOnly: true,
     });
     res.status(200).json({ status: "success" });
@@ -189,7 +197,7 @@ exports.protect = catchAsync(async function (req, res, next) {
     if (!token)
         return next(
             new AppError(
-                "you are not authorized. please log in to continue.",
+                "you are not logged in. please log in to continue.",
                 400
             )
         );
@@ -202,13 +210,15 @@ exports.protect = catchAsync(async function (req, res, next) {
     if (!decoded)
         return next(
             new AppError(
-                "you are not authorized. please log in to continue.",
+                "you are not logged in. please log in to continue.",
                 400
             )
         );
 
     //3.check if user changed password after issue of token.
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id)
+        .populate("transactions.credit")
+        .populate("transactions.debit");
 
     if (!user)
         return next(
@@ -224,6 +234,41 @@ exports.protect = catchAsync(async function (req, res, next) {
     res.locals.user = user;
     next();
 });
+
+exports.isLoggedIn = async (req, res, next) => {
+    //1 check if token exists
+    if (req.cookies.jwt) {
+        try {
+            //2 verfication of token
+            const decoded = await promisify(jwt.verify)(
+                req.cookies.jwt,
+                process.env.JWT_SECRET_KEY
+            );
+
+            //3 check if user still exists
+            const user = await User.findById(decoded.id)
+                .populate("transactions.credit")
+                .populate("transactions.debit");
+
+            if (!user) {
+                return next();
+            }
+
+            //4 check if user has not changed his password after the token is isued, if password is changed then token should be invalid
+            const changedPassword = user.changedPassword(decoded.iat);
+            if (changedPassword) {
+                return next();
+            }
+            //THERE IS A LOGGED IN USER.
+            req.user = user;
+            res.locals.user = user;
+            return next();
+        } catch (err) {
+            return next();
+        }
+    }
+    next();
+};
 
 exports.forgotPassword = catchAsync(async function (req, res, next) {
     //1.check if user exists and active
@@ -321,6 +366,16 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     if (!currentPassword || !newPassword || !confirmNewPassword)
         return next(new AppError("Please fill all Fields", 400));
 
+    if (currentPassword === newPassword)
+        return next(
+            new AppError("current & new password fields cannot be same", 400)
+        );
+
+    if (!newPassword === confirmNewPassword)
+        return next(
+            new AppError("new password and confirm password do not match", 400)
+        );
+
     const user = await User.findById(req.user.id).select("+password");
     console.log(user);
     if (!user)
@@ -339,4 +394,65 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
 
     //As password is updated we need to send new token
     createAndSendJWT(user, 200, req, res);
+});
+
+exports.updateMe = catchAsync(async function (req, res, next) {
+    const { name } = req.body;
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { name },
+        { new: true }
+    );
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user,
+        },
+    });
+});
+
+const checkUser = async function (req, res, next) {
+    //1.get user details
+    const { email, password } = req.body;
+    if (!email || !password)
+        return next(new AppError("Please provide email and password", 400));
+
+    //2. check if user exists
+    const user = await User.findOne({ email: email }).select(
+        "+password +active"
+    );
+    if (!user || !user.active)
+        return next(new AppError("User does not exist. Please sign up", 404));
+
+    //3.check if passwords match
+    const passMatch = await user.checkPassword(password, user.password);
+    if (!passMatch)
+        return next(new AppError("Incorrect Password. please try again", 400));
+
+    return user;
+};
+
+exports.checkAndDeleteUser = catchAsync(async function (req, res, next) {
+    if (!req.user.email === req.body.email) {
+        return next(new AppError("Incorrect email. please try again", 400));
+    }
+    //for this method to work we need to put user password on req.user and i didn't want that
+    // const passMatch = await req.user.checkPassword(
+    //     req.body.password,
+    //     req.user.password
+    // );
+    // if (!passMatch)
+    //     return next(new AppError("Incorrect Password. please try again", 400));
+
+    const user = await checkUser(req, res, next);
+    await User.findByIdAndDelete(user.id);
+
+    res.cookie("jwt", "logout", {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+    });
+    res.status(200).json({
+        status: "success",
+    });
 });

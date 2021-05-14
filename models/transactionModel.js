@@ -10,10 +10,12 @@ const transactionSchema = new mongoose.Schema({
     recipient: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: [true, "A transaction must have sender"],
-        // type: String,
-        // required: [true, "A transaction must have a recipient"],
-        // validate: [validator.isEmail, "Enter a valid recipient email id"],
+        required: [true, "A transaction must have recipient"],
+    },
+    recipientEmail: {
+        type: String,
+        validate: [validator.isEmail, "Enter a valid recipient email id"],
+        required: [true, "A transaction must have a recipient email"],
     },
     date: {
         type: Date,

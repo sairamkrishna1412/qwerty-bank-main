@@ -17,4 +17,9 @@ block content
                     .input-box
                         label(for='confirm-password') Confirm password
                         input#confirm-password.input.input__signup(type='password' minlength='8' required='')
-                    input.btn.btn__signup(type='submit' value='Sign up')
+                    button.btn.btn__signup(type='submit') Sign up &nbsp;
+                        //- i.fa.fa-spinner.fa-spin.spinner
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
+    .flex.verify-div.hidden
+        h2.email-text
+          

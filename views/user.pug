@@ -1,0 +1,89 @@
+extends base
+
+mixin transRow(transaction)
+    tr
+        td.transaction-atr.ti__date=transaction.date.toLocaleString('en-IN',{year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'})
+        td.transaction-atr.ti__type=transaction.type
+        td.transaction-atr.ti__description=`To ${transaction.recipientEmail} : ${transaction.remarks}`
+        td.transaction-atr.ti__amount=transaction.amount
+
+
+block content
+    main#main
+    // <h1>My transactions</h1>
+    .user-container.row
+        .user-profile
+            img.profile-img(src=`/img/users/${user.photo}` alt=`${user.name} photo`)
+            h3.user-welcome=user.name
+            a(href='/profile')
+                img.profile-edit(src='/img/edit.png' alt='')
+        .account-summary.sep
+            .balance.flex
+                h3.highlight Balance
+                span#account-balance=creditTotal - debitTotal
+            .totals
+                .total-credit.total-item
+                    h3.highlight CREDIT
+                    span#total-credit=creditTotal
+                .total-debit.total-item
+                    h3.highlight DEBIT
+                    span#total-debit=debitTotal
+        .transaction__container.sep
+            h3 Transactions
+            .transactions_box
+                table.transactions_table
+                    thead.transactions_header
+                        tr
+                            th.table-date Date
+                            th.table-type Type
+                            th.table-description Description
+                            th.table-amount Amount
+                    tbody.transactions_body
+                        //- each transaction in transactions
+                        //-     +transRow(transaction)
+                        -var count = transactions.length>10 ? 10 : transactions.length;
+                        -var miniTransactions = transactions.slice(0,count);
+
+                        each transaction in miniTransactions
+                            +transRow(transaction)
+
+            p.p_all-transactions
+                a.link_all-transactions(href='#') View all
+        .utilities-box.sep
+            .transfer-money
+                h3.util-heading Transfer money
+                form.transfer-form.util-form(autocomplete="off")
+                    input.form_field.transfer-form--username(type='email' placeholder='email')
+                    input.form_field.transfer-form--amount(type='number' placeholder='amount' min=0)
+                    input.form_field.transfer-form--description(type='text' placeholder='description')
+                    button.btn.form_field.submit-form.submit-form--transfer(type="submit")
+                        .transfer-arrow →
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
+                
+                    //- | →
+            .pay-bills
+                h3.util-heading Pay bills
+                form.paybill-form.util-form
+                    select#bill-type.form_field.paybill-form--select(name='bill-type')
+                        option(value='Electricity')
+                            | Electricity
+                        option(value='Mobile recharge')
+                            | Mobile Recharge
+                        //
+                            <option value="Brodband">Brodband</option>
+                            <option value="DTH">DTH</option>
+                    input.form_field.paybill-form--electricity(type='number' placeholder='USC(service) number' minlength=6)
+                    input.form_field.paybill-form--mobile.hidden(type='tel' placeholder='mobile number'  pattern="[0-9]{10}")
+                    input.form_field.paybill-form--amount(type='number' placeholder='amount' min=0)
+                    input.form_field.paybill-form--description(type='text' placeholder='description')
+                    button.btn.form_field.submit-form.submit-form--paybill(type="submit")
+                        .paybill-arrow →
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
+            .close-account
+                h3.util-heading Close Account
+                form.close-form.util-form
+                    input.form_field.close-form--username(type='text' placeholder='email')
+                    input.form_field.close-form--password(type='password' placeholder='password')
+                    button.btn.form_field.submit-form.submit-form--closeAcc(type="submit")
+                        .closeAcc-arrow →
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden

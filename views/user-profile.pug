@@ -1,0 +1,40 @@
+extends base
+block content
+    main#main
+        .profile__container
+            .back-cover
+                img.user-cover(src='../img/user-cover.jpg' alt='')
+            .profile__img-box
+                input#photo.form__upload(type='file' accept='image/*' name='photo')
+                label(for='photo')
+                    img.profile-img.me-img(src=`/img/users/${user.photo}` alt=`${user.name} photo`)
+        .details__container.row
+            .update-details
+                h3 Account settings
+                form.form-update-details
+                    .input-box
+                        label(for='name') Name
+                        input#name.input.input__udetails(type='text' minlength='3' value=`${user.name}` required)
+                    //- .input-box
+                    //-     label(for='email') Email
+                    //-     input#email.input.input__udetails(type='email' value=`${user.email}` required)
+                    button.btn.btn__user-profile.btn__udetails(type='submit')
+                        .btn-text save details
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
+
+        .pass__container.row
+            .update-pass
+                h3 update password
+                form.form-update-password
+                    .input-box
+                        label(for='cur_pass') Current password
+                        input#cur_pass.input.input__upass(type='password' minlength='8' placeholder ='••••••••' required )
+                    .input-box
+                        label(for='new_pass') New password
+                        input#new_pass.input.input__upass(type='password' minlength='8' placeholder ='••••••••' required)
+                    .input-box
+                        label(for='confirm_new_pass') Confirm password
+                        input#confirm_new_pass.input.input__upass(type='password' minlength='8' placeholder ='••••••••' required)
+                    button.btn.btn__user-profile.btn__upass(type='submit')
+                        .btn-text-sp save password
+                        i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
