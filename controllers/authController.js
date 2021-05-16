@@ -24,6 +24,7 @@ function createAndSendJWT(user, statusCode, req, res) {
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
+        secure: req.secure || req.headers["x-forwarded-proto"] === "https",
     };
     res.cookie("jwt", token, cookieOptions);
     //removing user password from output.
@@ -162,6 +163,7 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
+        secure: req.secure || req.headers["x-forwarded-proto"] === "https",
     };
     res.cookie("jwt", token, cookieOptions);
 
@@ -380,6 +382,7 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     //As password is updated we need to send new token
     createAndSendJWT(user, 200, req, res);
 });
+secure: req.secure || req.headers["x-forwarded-proto"] === "https";
 
 const checkUser = async function (req, res, next) {
     //1.get user details
