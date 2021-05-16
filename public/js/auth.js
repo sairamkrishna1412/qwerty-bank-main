@@ -62,7 +62,7 @@ export const signUp = async function (email, name, password, confirmPassword) {
             document.querySelector(".verify-div").classList.remove("hidden");
             document.querySelector(".email-text").innerHTML =
                 response.data.data.message;
-            alert("success", "Please check your Email.", 20);
+            alert("success", "Please check your Email.", 30);
             // console.log(response);
         }
     } catch (err) {

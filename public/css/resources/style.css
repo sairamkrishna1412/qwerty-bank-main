@@ -73,9 +73,11 @@ th {
 .verify-div{
     height: 80vh;
     justify-content: center;
+    align-items: center;
 }
 .email-text{
-    font-size: 3rem;
+    font-size: 2rem;
+    line-height: 1.5;
 }
 
 /*-------HEADING-----------*/

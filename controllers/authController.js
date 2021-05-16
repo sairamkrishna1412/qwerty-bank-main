@@ -100,10 +100,10 @@ exports.signup = catchAsync(async function (req, res, next) {
 
     const verifyExists = await Verify.findOne({ userID: user.id });
     if (verifyExists) {
-        res.status(200).json({
+        return res.status(200).json({
             status: "success",
             data: {
-                message: `We've already sent a verification email which is still valid. please check your email`,
+                message: `We've already sent a verification email which is still valid. please check your email. Please check in spam section if not present in inbox :)`,
             },
         });
         // return next(
@@ -124,7 +124,7 @@ exports.signup = catchAsync(async function (req, res, next) {
     res.status(200).json({
         status: "success",
         data: {
-            message: `We've sent a verification link to ${user.email}. Valid for 15 mins.`,
+            message: `We've sent a verification link to ${user.email}. Valid for 15 mins. Please check in spam section if not present in inbox :)`,
         },
     });
 });
