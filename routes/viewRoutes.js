@@ -11,4 +11,9 @@ router.get("/signup", viewController.getSignupForm);
 // router.use(authController.isLoggedIn);
 router.get("/account", authController.protect, viewController.getUser);
 router.get("/profile", authController.protect, viewController.getProfile);
+router.get(
+    "/my-transactions",
+    authController.protect,
+    viewController.getTransactions
+);
 module.exports = router;

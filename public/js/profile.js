@@ -1,4 +1,5 @@
 import axios from "axios";
+import { alert } from "./alert";
 
 export const updateUser = async function (type, data) {
     try {
@@ -14,13 +15,17 @@ export const updateUser = async function (type, data) {
             url,
             data,
         });
-        if (response.data.status === "success" && type === "auth") {
+        if (response.data.status === "success") {
+            const message =
+                type === "auth" ? "Password updated." : "Details updated.";
+            alert("success", message);
             location.reload();
         }
     } catch (err) {
         const sp = document.querySelector(".btn-text-sp");
         sp.textContent = "save password";
         sp.nextElementSibling.style.display = "none";
-        console.log(err.response);
+        alert("error", err.response.data.message);
+        // console.log(err.response);
     }
 };

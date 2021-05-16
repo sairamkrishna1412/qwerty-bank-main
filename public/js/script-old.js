@@ -295,7 +295,7 @@ class App {
                             this.#userAccount.username
                         } : ${description}`;
                         const dateTime = this._createDate();
-                        console.log(toAccount);
+                        // console.log(toAccount);
                         this.#userAccount.transactions.push({
                             value: -amount,
                             date: dateTime,
@@ -322,8 +322,10 @@ class App {
         // ) {
 
         // }
-        base.transferUsername.value = base.transferDescription.value = base.transferAmount.value =
-            "";
+        base.transferUsername.value =
+            base.transferDescription.value =
+            base.transferAmount.value =
+                "";
         base.transferAmount.blur();
         base.transferDescription.blur();
         this._updateUI();
@@ -365,8 +367,11 @@ class App {
         //     this.#userAccount.balance >= amount
         // ) {
         // }
-        base.payBillTypeElectricity.value = base.payBillTypeRecharge.value = base.paybillAmount.value = base.paybillDescription.value =
-            "";
+        base.payBillTypeElectricity.value =
+            base.payBillTypeRecharge.value =
+            base.paybillAmount.value =
+            base.paybillDescription.value =
+                "";
         base.paybillAmount.blur();
         base.paybillDescription.blur();
         this._updateUI();
@@ -425,8 +430,12 @@ class App {
                         this._hideDialog();
                         // this._updateTable();
                         setTimeout(this._updateTable.bind(this), 200);
-                        base.newUser_name.value = base.newUserEmail.value = base.newUserUserName.value = base.newUserPassword.value = base.newUserRePassword.value =
-                            "";
+                        base.newUser_name.value =
+                            base.newUserEmail.value =
+                            base.newUserUserName.value =
+                            base.newUserPassword.value =
+                            base.newUserRePassword.value =
+                                "";
                         base.newUserRePassword.blur();
                     } else alert("passwords dont match");
                 } else alert("password is too short");

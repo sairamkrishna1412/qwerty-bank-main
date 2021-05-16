@@ -3,6 +3,11 @@ const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const compression = require("compression");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const hpp = require("hpp");
 
 const userRouter = require("./routes/userRoutes");
 const viewRouter = require("./routes/viewRoutes");
@@ -11,6 +16,25 @@ const errorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 
 const app = express();
+
+app.enable("trust proxy");
+
+app.use(compression());
+app.use(helmet());
+
+//parse json request body.
+app.use(express.json({ limit: "10kb" }));
+
+app.use(cors());
+app.options("*", cors());
+
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(mongoSanitize());
+app.use(xss());
+
+/*remove this after implementing query parameters like amount date etc*/
+app.use(hpp());
 
 //middleware
 app.set("view engine", "pug");
@@ -21,12 +45,6 @@ if (process.env.NODE_ENV === "development") {
 }
 //serve static files
 app.use(express.static(path.join(__dirname, "public")));
-
-//parse json request body.
-app.use(express.json({ limit: "10kb" }));
-
-app.use(cors());
-app.use(cookieParser());
 
 //ROUTES
 app.use("/", viewRouter);

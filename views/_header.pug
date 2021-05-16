@@ -3,13 +3,16 @@ header
         .row.flex.nav-bar
             .hero-text-box
                 h1.hero-text
-                    a(href='/') Qwerty Bank
+                    if user
+                        a(href='/account') Qwerty Bank
+                    else
+                        a(href='/') Qwerty Bank
             ul.nav-main
                 li
                     if  user
-                        button.btn.nav__logout Log out
+                        button.btn.nav__logout Sign Out
                     else
-                        a.btn.nav__login(href='/login') Login
+                        a.btn.nav__login(href='/login') LOG IN
                 li
                     -if(!user)
-                        a.btn.nav__signup(href='/signup') Sign up
+                        a.btn.nav__signup(href='/signup') SIGN UP

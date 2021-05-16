@@ -1,0 +1,24 @@
+extends base
+
+mixin transRow(transaction)
+    tr  
+        td.transaction-atr.ti__date=transaction.date.toLocaleString('en-IN',{year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'})
+        td.transaction-atr.ti__type.cap=transaction.type
+        td.transaction-atr.ti__description=`To ${transaction.recipientEmail} : ${transaction.remarks}`
+        td.transaction-atr.ti__amount=transaction.amount
+
+block content
+    main#main
+    .transaction__container.sep
+            h3 &nbsp;&nbsp;&nbsp;Transactions
+            .transactions_box--all
+                table.transactions_table
+                    thead.transactions_header
+                        tr
+                            th.table-date Date
+                            th.table-type Type
+                            th.table-description Description
+                            th.table-amount Amount
+                    tbody.transactions_body
+                        each transaction in transactions
+                            +transRow(transaction)

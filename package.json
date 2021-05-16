@@ -4,8 +4,10 @@
   "description": "Internet Banking Application",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon NODE_ENV=production server.js",
+    "start:node": "node server.js --trace-sync-io",
     "dev": "webpack --mode development",
+    "build": "webpack --mode production",
     "watch": "webpack --progress --watch --mode development",
     "debug": "ndb server.js"
   },
@@ -23,16 +25,24 @@
     "@sendgrid/mail": "^7.4.2",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.1.0",
+    "express-rate-limit": "^5.2.6",
+    "helmet": "^4.6.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.7",
     "morgan": "^1.10.0",
+    "multer": "^1.4.2",
     "pug": "^3.0.2",
     "regenerator-runtime": "^0.13.7",
-    "validator": "^13.6.0"
+    "sharp": "^0.28.2",
+    "validator": "^13.6.0",
+    "xss-clean": "^0.1.1"
   },
   "engines": {
     "node": "^14"

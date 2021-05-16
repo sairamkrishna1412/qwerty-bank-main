@@ -95,7 +95,7 @@ exports.signup = catchAsync(async function (req, res, next) {
         );
 
     if (user.active)
-        return next(new AppError("User with this mail already exists.", 400));
+        return next(new AppError("User with this email already exists.", 400));
 
     const verifyExists = await Verify.findOne({ userID: user.id });
     if (verifyExists) {
@@ -194,40 +194,25 @@ exports.protect = catchAsync(async function (req, res, next) {
         token = req.cookies.jwt;
     }
 
-    if (!token)
-        return next(
-            new AppError(
-                "you are not logged in. please log in to continue.",
-                400
-            )
-        );
+    if (!token) return next(new AppError("Please Log In.", 400));
 
     //2.check token
     const decoded = await promisify(jwt.verify)(
         token,
         process.env.JWT_SECRET_KEY
     );
-    if (!decoded)
-        return next(
-            new AppError(
-                "you are not logged in. please log in to continue.",
-                400
-            )
-        );
+    if (!decoded) return next(new AppError("Please Log In.", 400));
 
     //3.check if user changed password after issue of token.
     const user = await User.findById(decoded.id)
         .populate("transactions.credit")
         .populate("transactions.debit");
 
-    if (!user)
-        return next(
-            new AppError("This user is deleted. please login / sign up", 400)
-        );
+    if (!user) return next(new AppError("No user found, please Sign Up.", 400));
 
     const changedPassword = user.changedPassword(decoded.iat);
     if (changedPassword)
-        return next(new AppError("Session expired. please log in again", 400));
+        return next(new AppError("Session expired, please Log In again.", 400));
 
     //GRANT PERMISSION ONLY IF ALL CONDITIONS ARE SATISFIED
     req.user = user;
@@ -273,10 +258,10 @@ exports.isLoggedIn = async (req, res, next) => {
 exports.forgotPassword = catchAsync(async function (req, res, next) {
     //1.check if user exists and active
     const { email } = req.body;
-    if (!email) return next(new AppError("Please provide an email", 400));
+    if (!email) return next(new AppError("Please provide an Email.", 400));
 
     const user = await User.findOne({ email }).select("+active");
-    console.log(user);
+    // console.log(user);
     if (!user || !user.active) {
         return next(new AppError("No user found.", 404));
     }
@@ -286,7 +271,7 @@ exports.forgotPassword = catchAsync(async function (req, res, next) {
 
     //3.send random hash to user
     const url = createUrl(req, `/users/resetPassword/${randomBytes}`);
-    console.log(url);
+    // console.log(url);
 
     await sendMail(user, url, "resetPassword");
     res.status(200).json({
@@ -313,7 +298,7 @@ exports.resetPassword = catchAsync(async function (req, res, next) {
     if (user.passwordResetExpires.getTime() < new Date().getTime())
         return next(
             new AppError(
-                "This Reset link expired. please generate new password reset link.",
+                "This Reset link has expired. please generate new password reset link.",
                 400
             )
         );
@@ -364,20 +349,20 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
 
     if (!currentPassword || !newPassword || !confirmNewPassword)
-        return next(new AppError("Please fill all Fields", 400));
+        return next(new AppError("Please fill all fields.", 400));
 
     if (currentPassword === newPassword)
         return next(
-            new AppError("current & new password fields cannot be same", 400)
+            new AppError("Current & New password cannot be same.", 400)
         );
 
-    if (!newPassword === confirmNewPassword)
+    if (newPassword !== confirmNewPassword)
         return next(
-            new AppError("new password and confirm password do not match", 400)
+            new AppError("New password & confirm password do not match.", 400)
         );
 
     const user = await User.findById(req.user.id).select("+password");
-    console.log(user);
+    // console.log(user);
     if (!user)
         return next(new AppError("You are not loggeg in. please login", 400));
 
@@ -386,7 +371,7 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
         user.password
     );
     if (!passwordMatch)
-        return next(new AppError("Incorrect password. Retry", 400));
+        return next(new AppError("Incorrect password, Try again.", 400));
 
     user.password = newPassword;
     user.confirmPassword = confirmNewPassword;
@@ -396,46 +381,30 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     createAndSendJWT(user, 200, req, res);
 });
 
-exports.updateMe = catchAsync(async function (req, res, next) {
-    const { name } = req.body;
-    const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { name },
-        { new: true }
-    );
-
-    res.status(200).json({
-        status: "success",
-        data: {
-            user,
-        },
-    });
-});
-
 const checkUser = async function (req, res, next) {
     //1.get user details
     const { email, password } = req.body;
     if (!email || !password)
-        return next(new AppError("Please provide email and password", 400));
+        return next(new AppError("Please provide email and password.", 400));
 
     //2. check if user exists
     const user = await User.findOne({ email: email }).select(
         "+password +active"
     );
     if (!user || !user.active)
-        return next(new AppError("User does not exist. Please sign up", 404));
+        return next(new AppError("No user found, Please Sign Up.", 404));
 
     //3.check if passwords match
     const passMatch = await user.checkPassword(password, user.password);
     if (!passMatch)
-        return next(new AppError("Incorrect Password. please try again", 400));
+        return next(new AppError("Incorrect password, Try again.", 400));
 
     return user;
 };
 
 exports.checkAndDeleteUser = catchAsync(async function (req, res, next) {
-    if (!req.user.email === req.body.email) {
-        return next(new AppError("Incorrect email. please try again", 400));
+    if (req.user.email !== req.body.email) {
+        return next(new AppError("Incorrect email.", 400));
     }
     //for this method to work we need to put user password on req.user and i didn't want that
     // const passMatch = await req.user.checkPassword(

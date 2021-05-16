@@ -12,24 +12,27 @@ exports.newTransaction = catchAsync(async function (req, res, next) {
     const amount = req.body.amount;
     const remarks = req.body.remarks;
     if (!recipientEmail)
-        return next(new AppError("Enter a recipient email Id", 400));
-    if (!amount) return next(new AppError("Enter amount", 400));
+        return next(new AppError("Enter recipient's Email Id.", 400));
+    if (!amount) return next(new AppError("Enter amount.", 400));
 
     const sender = await User.findById(req.user.id);
-    if (!sender) return next(new AppError("Sender error"));
+    if (!sender)
+        return next(
+            new AppError("Something went wrong, please try again.", 400)
+        );
 
     const recipient = await User.findOne({ email: recipientEmail });
-    if (!recipient) return next(new AppError("Recipient does not exist", 400));
+    if (!recipient) return next(new AppError("Recipient does not exist.", 400));
 
     if (sender.email === recipient.email)
-        return next(new AppError("You cannot send money to yourself.", 400));
+        return next(
+            new AppError("Sending money from you to you is useless.", 400)
+        );
 
     //check if sender balance is greater than amount
-    if (amount <= 0) return next(new AppError("Minimum amount is 1 Rs", 400));
+    if (amount <= 0) return next(new AppError("Minimum amount is 1 Rs.", 400));
     if (sender.transactions.total < amount)
-        return next(
-            new AppError("Amount cannot be greater than your balance", 400)
-        );
+        return next(new AppError("Insufficient balance.", 400));
 
     const transaction = await Transaction.create({
         sender: sender.id,

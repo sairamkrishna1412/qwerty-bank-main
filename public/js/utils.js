@@ -1,4 +1,5 @@
 import axios from "axios";
+import { alert } from "./alert";
 
 export const transferMoney = async function (email, amount, remarks) {
     try {
@@ -7,13 +8,15 @@ export const transferMoney = async function (email, amount, remarks) {
         // document.querySelector(".spinner-hidden").style.display = "inline-block";
         const response = await makeTransaction(email, amount, remarks);
         if (response.data.status === "success") {
+            alert("success", "Transfer sucessful!");
             location.reload();
         }
     } catch (err) {
         loader("remove", "transfer");
         // document.querySelector(".spinner-hidden").style.display = "none";
         // document.querySelector(".transfer-arrow").textContent = "→";
-        console.log(err.response);
+        // console.log(err.response);
+        alert("error", err.response.data.message);
     }
 };
 
@@ -26,11 +29,13 @@ export const paybill = async function (type, amount, remarks) {
                 : "recharge@qwerty.com";
         const response = await makeTransaction(email, amount, remarks);
         if (response.data.status === "success") {
+            alert("success", "Payment successful!");
             location.reload();
         }
     } catch (err) {
         loader("remove", "paybill");
-        console.log(err.response);
+        // console.log(err.response);
+        alert("error", err.response.data.message);
     }
 };
 
@@ -46,11 +51,15 @@ export const deleteUser = async function (email, password) {
             },
         });
         if (response.data.status === "success") {
+            alert("sucess", "Goodbye!");
             location.assign("/");
         }
     } catch (err) {
+        document.querySelector(".close-form--username").value = "";
+        document.querySelector(".close-form--password").value = "";
         loader("remove", "closeAcc");
-        console.log(err.response);
+        // console.log(err.response);
+        alert("error", err.response.data.message);
     }
 };
 

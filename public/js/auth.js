@@ -1,4 +1,5 @@
 import axios from "axios";
+import { alert } from "./alert";
 
 export const login = async function (email, password) {
     try {
@@ -14,11 +15,13 @@ export const login = async function (email, password) {
         });
         if (response.data.status === "success") {
             // console.log(response);
+            alert("success", "Logging in!");
             window.location.assign("/account");
         }
     } catch (err) {
         document.querySelector(".spinner-hidden").style.display = "none";
-        console.error(err.response);
+        alert("error", err.response.data.message);
+        // console.error(err.response);
     }
 };
 
@@ -29,11 +32,13 @@ export const logout = async function () {
             url: "/users/logout",
         });
         if (response.data.status === "success") {
+            alert("success", "Logging out.");
             // console.log(response);
             location.assign("/");
         }
     } catch (err) {
-        console.error(err);
+        alert("error", "Something went wrong, Try again.");
+        // console.log(error.response);
     }
 };
 
@@ -57,10 +62,12 @@ export const signUp = async function (email, name, password, confirmPassword) {
             document.querySelector(".verify-div").classList.remove("hidden");
             document.querySelector(".email-text").innerHTML =
                 response.data.data.message;
-            console.log(response);
+            alert("success", "Please check your Email.", 20);
+            // console.log(response);
         }
     } catch (err) {
         document.querySelector(".spinner-hidden").style.display = "none";
-        console.log(err.response);
+        alert("error", err.response.data.message);
+        // console.log(err.response);
     }
 };

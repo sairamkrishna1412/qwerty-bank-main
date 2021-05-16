@@ -99,8 +99,10 @@ if (logoutBtn) {
 if (formUpdateDetails) {
     formUpdateDetails.addEventListener("submit", function (e) {
         e.preventDefault();
-        const name = document.getElementById("name").value;
-        updateUser("details", { name });
+        const data = new FormData();
+        data.append("name", document.getElementById("name").value);
+        data.append("photo", document.getElementById("photo").files[0]);
+        updateUser("details", data);
     });
 }
 

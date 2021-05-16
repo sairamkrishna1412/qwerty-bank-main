@@ -17,6 +17,38 @@ exports.getSignupForm = function (req, res) {
 };
 
 exports.getUser = function (req, res) {
+    const { user, creditTotal, debitTotal, transactions } = myTransactions(
+        req,
+        res
+    );
+    res.status(200).render("user", {
+        title: "Account",
+        user,
+        creditTotal,
+        debitTotal,
+        transactions,
+    });
+};
+
+exports.getProfile = function (req, res) {
+    res.status(200).render("user-profile");
+};
+
+exports.getTransactions = function (req, res) {
+    const { user, creditTotal, debitTotal, transactions } = myTransactions(
+        req,
+        res
+    );
+    res.status(200).render("transactions", {
+        title: "Transactions",
+        user,
+        creditTotal,
+        debitTotal,
+        transactions,
+    });
+};
+
+const myTransactions = function (req, res) {
     const user = req.user;
     const credit = user.transactions.credit;
     const debit = user.transactions.debit;
@@ -39,16 +71,5 @@ exports.getUser = function (req, res) {
     transactions.sort(function (a, b) {
         return b.date - a.date;
     });
-
-    res.status(200).render("user", {
-        title: "Account",
-        user,
-        creditTotal,
-        debitTotal,
-        transactions,
-    });
-};
-
-exports.getProfile = function (req, res) {
-    res.status(200).render("user-profile");
+    return { user, creditTotal, debitTotal, transactions };
 };

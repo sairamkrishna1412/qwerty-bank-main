@@ -3,7 +3,7 @@ extends base
 mixin transRow(transaction)
     tr
         td.transaction-atr.ti__date=transaction.date.toLocaleString('en-IN',{year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'})
-        td.transaction-atr.ti__type=transaction.type
+        td.transaction-atr.ti__type.cap=transaction.type
         td.transaction-atr.ti__description=`To ${transaction.recipientEmail} : ${transaction.remarks}`
         td.transaction-atr.ti__amount=transaction.amount
 
@@ -14,7 +14,7 @@ block content
     .user-container.row
         .user-profile
             img.profile-img(src=`/img/users/${user.photo}` alt=`${user.name} photo`)
-            h3.user-welcome=user.name
+            h3.user-welcome.cap=user.name
             a(href='/profile')
                 img.profile-edit(src='/img/edit.png' alt='')
         .account-summary.sep
@@ -48,14 +48,14 @@ block content
                             +transRow(transaction)
 
             p.p_all-transactions
-                a.link_all-transactions(href='#') View all
+                a.link_all-transactions(href='/my-transactions') View all
         .utilities-box.sep
             .transfer-money
                 h3.util-heading Transfer money
                 form.transfer-form.util-form(autocomplete="off")
-                    input.form_field.transfer-form--username(type='email' placeholder='email')
-                    input.form_field.transfer-form--amount(type='number' placeholder='amount' min=0)
-                    input.form_field.transfer-form--description(type='text' placeholder='description')
+                    input.form_field.transfer-form--username(type='email' placeholder='Email' required)
+                    input.form_field.transfer-form--amount(type='number' placeholder='Amount' min=0 required)
+                    input.form_field.transfer-form--description(type='text' placeholder='Description')
                     button.btn.form_field.submit-form.submit-form--transfer(type="submit")
                         .transfer-arrow →
                         i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
@@ -73,17 +73,17 @@ block content
                             <option value="Brodband">Brodband</option>
                             <option value="DTH">DTH</option>
                     input.form_field.paybill-form--electricity(type='number' placeholder='USC(service) number' minlength=6)
-                    input.form_field.paybill-form--mobile.hidden(type='tel' placeholder='mobile number'  pattern="[0-9]{10}")
-                    input.form_field.paybill-form--amount(type='number' placeholder='amount' min=0)
-                    input.form_field.paybill-form--description(type='text' placeholder='description')
+                    input.form_field.paybill-form--mobile.hidden(type='tel' placeholder='Mobile number'  pattern="[0-9]{10}")
+                    input.form_field.paybill-form--amount(type='number' placeholder='Amount' min=0 required)
+                    input.form_field.paybill-form--description(type='text' placeholder='Description')
                     button.btn.form_field.submit-form.submit-form--paybill(type="submit")
                         .paybill-arrow →
                         i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
             .close-account
                 h3.util-heading Close Account
                 form.close-form.util-form
-                    input.form_field.close-form--username(type='text' placeholder='email')
-                    input.form_field.close-form--password(type='password' placeholder='password')
+                    input.form_field.close-form--username(type='text' placeholder='Email' required)
+                    input.form_field.close-form--password(type='password' placeholder='Password' minlength=8 required)
                     button.btn.form_field.submit-form.submit-form--closeAcc(type="submit")
                         .closeAcc-arrow →
                         i.fa.fa-circle-o-notch.fa-spin.spinner-hidden
