@@ -4,9 +4,10 @@
   "description": "Internet Banking Application",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon NODE_ENV=production server.js",
-    "start:node": "node server.js --trace-sync-io",
-    "dev": "webpack --mode development",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "start:trace-sync": "node server.js --trace-sync-io",
+    "webpack-dev": "webpack --mode development",
     "build": "webpack --mode production",
     "watch": "webpack --progress --watch --mode development",
     "debug": "ndb server.js"
