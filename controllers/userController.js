@@ -38,15 +38,18 @@ exports.resizeSavePhoto = catchAsync(async function (req, res, next) {
 
     //resize format, and save file.
     await sharp(req.file.buffer)
+        .rotate()
         .resize(500, 500)
         .toFormat("jpeg")
         .jpeg({ quality: 90 })
         .toFile(`public/img/users/${req.file.filename}`);
 
-    const existingProfilePath = `${__dirname}/../public/img/users/${req.user.photo}`;
-    fs.unlink(existingProfilePath, (err) => {
-        if (err) console.log(err);
-    });
+    if (req.user.photo !== "default.png") {
+        const existingProfilePath = `${__dirname}/../public/img/users/${req.user.photo}`;
+        fs.unlink(existingProfilePath, (err) => {
+            if (err) console.log(err);
+        });
+    }
 
     next();
 });

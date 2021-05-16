@@ -2,12 +2,12 @@ import axios from "axios";
 import { alert } from "./alert";
 
 export const updateUser = async function (type, data) {
+    let button = type === "auth" ? ".btn-text-sp" : ".btn-text";
+    const pressedBtn = document.querySelector(button);
+    const buttonVal = pressedBtn.value;
+    pressedBtn.textContent = "";
+    pressedBtn.nextElementSibling.style.display = "inline-block";
     try {
-        if (type === "auth") {
-            const sp = document.querySelector(".btn-text-sp");
-            sp.textContent = "";
-            sp.nextElementSibling.style.display = "inline-block";
-        }
         const url =
             type === "auth" ? "/users/updatePassword" : "/users/updateMe";
         const response = await axios({
@@ -22,9 +22,8 @@ export const updateUser = async function (type, data) {
             location.reload();
         }
     } catch (err) {
-        const sp = document.querySelector(".btn-text-sp");
-        sp.textContent = "save password";
-        sp.nextElementSibling.style.display = "none";
+        pressedBtn.textContent = buttonVal;
+        pressedBtn.nextElementSibling.style.display = "none";
         alert("error", err.response.data.message);
         // console.log(err.response);
     }

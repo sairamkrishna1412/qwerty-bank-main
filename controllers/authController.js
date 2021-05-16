@@ -140,12 +140,12 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
         .digest("hex");
 
     const verified = await Verify.findOneAndUpdate(
-        { hash: encryptedToken },
+        { hash: encryptedToken, verified: { $ne: true } },
         { verified: true },
         { new: true }
     );
     // console.log(verified);
-    if (!verified) return next(new AppError("Wrong link. try again!", 400));
+    if (!verified) return next(new AppError("This link is invalid.", 400));
 
     const user = await User.findByIdAndUpdate(
         verified.userID,
@@ -171,7 +171,23 @@ exports.verifySignup = catchAsync(async function (req, res, next) {
 });
 
 exports.login = catchAsync(async function (req, res, next) {
-    const user = await checkUser(req, res, next);
+    // const user = await checkUser(req, res, next);
+    //1.get user details
+    const { email, password } = req.body;
+    if (!email || !password)
+        return next(new AppError("Please provide email and password.", 400));
+
+    //2. check if user exists
+    const user = await User.findOne({ email: email }).select(
+        "+password +active"
+    );
+    if (!user || !user.active)
+        return next(new AppError("No user found, Please Sign Up.", 404));
+
+    //3.check if passwords match
+    const passMatch = await user.checkPassword(password, user.password);
+    if (!passMatch)
+        return next(new AppError("Incorrect password, Try again.", 400));
     //2.send jwt token after authenticating.
     createAndSendJWT(user, 200, req, res);
 });
@@ -383,7 +399,42 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     createAndSendJWT(user, 200, req, res);
 });
 
-const checkUser = async function (req, res, next) {
+//this is some how not working when deployed and error is not properly sent
+// const checkUser = async function (req, res, next) {
+//     //1.get user details
+//     const { email, password } = req.body;
+//     if (!email || !password)
+//         return next(new AppError("Please provide email and password.", 400));
+
+//     //2. check if user exists
+//     const user = await User.findOne({ email: email }).select(
+//         "+password +active"
+//     );
+//     if (!user || !user.active)
+//         return next(new AppError("No user found, Please Sign Up.", 404));
+
+//     //3.check if passwords match
+//     const passMatch = await user.checkPassword(password, user.password);
+//     if (!passMatch)
+//         return next(new AppError("Incorrect password, Try again.", 400));
+
+//     return user;
+// };
+
+exports.checkAndDeleteUser = catchAsync(async function (req, res, next) {
+    if (req.user.email !== req.body.email) {
+        return next(new AppError("Incorrect email.", 400));
+    }
+    //for this method to work we need to put user password on req.user and i didn't want that
+    // const passMatch = await req.user.checkPassword(
+    //     req.body.password,
+    //     req.user.password
+    // );
+    // if (!passMatch)
+    //     return next(new AppError("Incorrect Password. please try again", 400));
+
+    // const user = await checkUser(req, res, next);
+
     //1.get user details
     const { email, password } = req.body;
     if (!email || !password)
@@ -401,22 +452,6 @@ const checkUser = async function (req, res, next) {
     if (!passMatch)
         return next(new AppError("Incorrect password, Try again.", 400));
 
-    return user;
-};
-
-exports.checkAndDeleteUser = catchAsync(async function (req, res, next) {
-    if (req.user.email !== req.body.email) {
-        return next(new AppError("Incorrect email.", 400));
-    }
-    //for this method to work we need to put user password on req.user and i didn't want that
-    // const passMatch = await req.user.checkPassword(
-    //     req.body.password,
-    //     req.user.password
-    // );
-    // if (!passMatch)
-    //     return next(new AppError("Incorrect Password. please try again", 400));
-
-    const user = await checkUser(req, res, next);
     await User.findByIdAndDelete(user.id);
 
     res.cookie("jwt", "logout", {
