@@ -382,7 +382,6 @@ exports.updatePassword = catchAsync(async function (req, res, next) {
     //As password is updated we need to send new token
     createAndSendJWT(user, 200, req, res);
 });
-secure: req.secure || req.headers["x-forwarded-proto"] === "https";
 
 const checkUser = async function (req, res, next) {
     //1.get user details
