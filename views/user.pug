@@ -2,7 +2,7 @@ extends base
 
 mixin transRow(transaction)
     tr
-        td.transaction-atr.ti__date=transaction.date.toLocaleString('en-IN',{year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'})
+        td.transaction-atr.ti__date=transaction.date.toLocaleString('en-IN',{year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit', timeZone: 'Asia/Kolkata'})
         td.transaction-atr.ti__type.cap=transaction.type
         td.transaction-atr.ti__description=`To ${transaction.recipientEmail} : ${transaction.remarks}`
         td.transaction-atr.ti__amount=transaction.amount
